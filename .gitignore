@@ -1,5 +1,6 @@
 .DS_Store
 lock.json
 terraform-provider-aws_v2.61.0_x4
-.terraform.tfstate
-.terraform.tfstate.backup
+terraform.tfstate
+terraform.tfstate.backup
+modules.json
