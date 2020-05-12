@@ -104,6 +104,9 @@ resource "aws_internet_gateway" "example" {
   vpc_id = aws_vpc.example.id
 }
 
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.example.id
+}
 
 
 
