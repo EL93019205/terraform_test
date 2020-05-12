@@ -18,7 +18,7 @@ module "describe_regions_for_ec2" {
 }
 
 resource "aws_s3_bucket" "private" {
-  bucket = "private-pragmatic-terraform"
+  bucket = "junbucket-private"
 
   versioning {
     enabled = true
@@ -42,7 +42,7 @@ resource "aws_s3_bucket_public_access_block" "private" {
 }
 
 resource "aws_s3_bucket" "public" {
-  bucket = "public-pragmatic-terraform"
+  bucket = "junbucket-public"
   acl = "public-read"
 
   cors_rule {
@@ -54,7 +54,7 @@ resource "aws_s3_bucket" "public" {
 }
 
 resource "aws_s3_bucket" "alb_log" {
-  bucket = "alb-log-pragmatic-terraform"
+  bucket = "junbucket-alblog"
 
   lifecycle_rule {
     enabled = true
