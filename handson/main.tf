@@ -126,4 +126,8 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = false
 }
 
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.example.id
+}
+
 
