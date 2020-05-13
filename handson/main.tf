@@ -233,4 +233,8 @@ resource "aws_route" "private_1" {
   destination_cidr_block = "0.0.0.0/0"
 }
 
+resource "aws_security_group" "example" {
+  name = "example"
+  vpc_id = aws_vpc.example.id
+}
 
