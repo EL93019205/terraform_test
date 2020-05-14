@@ -312,4 +312,7 @@ resource "aws_lb_listener" "http" {
   }
 }
 
+data "aws_route53_zone" "example" {
+  name = "jun-web-free.com"
+}
 
