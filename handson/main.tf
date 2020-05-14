@@ -267,3 +267,7 @@ resource "aws_lb" "example" {
     Name = "alb_example"
   }
 }
+
+output "alb_dns_name" {
+  value = aws_lb.example.dns_name
+}
