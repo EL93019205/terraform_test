@@ -31,6 +31,7 @@ resource "aws_s3_bucket" "private" {
       }
     }
   }
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_public_access_block" "private" {
@@ -51,6 +52,7 @@ resource "aws_s3_bucket" "public" {
     allowed_headers = ["*"]
     max_age_seconds = 3000
   }
+  force_destroy = true
 }
 
 resource "aws_s3_bucket" "alb_log" {
@@ -247,7 +249,7 @@ resource "aws_lb" "example" {
   load_balancer_type = "application"
   internal = false
   idle_timeout = 60
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   subnets = [
     aws_subnet.public_0.id,
