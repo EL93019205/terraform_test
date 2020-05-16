@@ -475,3 +475,8 @@ module "nginx_sg" {
   port = 80
   cidr_blocks = [aws_vpc.example.cidr_block]
 }
+
+resource "aws_cloudwatch_log_group" "for_ecs" {
+  name = "/ecs/example"
+  retention_in_days = 180
+}
