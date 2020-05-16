@@ -63,6 +63,7 @@ resource "aws_s3_bucket" "alb_log" {
       days = "180"
     }
   }
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_policy" "alb_log" {
@@ -78,7 +79,7 @@ data "aws_iam_policy_document" "alb_log" {
 
     principals {
       type = "AWS"
-      identifiers = ["961072619344"]
+      identifiers =  ["582318560864"]
     }
   }
 }
@@ -263,9 +264,6 @@ resource "aws_lb" "example" {
     module.https_sg.security_group_id,
     module.http_redirect_sg.security_group_id,
   ]
-  tags = {
-    Name = "alb_example"
-  }
 }
 
 output "alb_dns_name" {
