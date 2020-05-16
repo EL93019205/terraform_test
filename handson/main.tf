@@ -423,5 +423,8 @@ resource "aws_lb_listener_rule" "example" {
     field = "path-pattern"
     values = ["/*"]
   }
+resource "aws_ecs_cluster" "example" {
+  name = "example"
+}
 
 }
