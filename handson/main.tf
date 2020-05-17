@@ -686,3 +686,11 @@ resource "aws_elasticache_replication_group" "example" {
   parameter_group_name = aws_elasticache_parameter_group.example.name
   subnet_group_name = aws_elasticache_subnet_group.example.name
 }
+
+module "redis_sg" {
+  source = "./security_group"
+  name = "redis-sg"
+  vpc_id = aws_vpc.example.id
+  port = 6379
+  cidr_blocks = [aws_vpc.example.cidr_block]
+}
