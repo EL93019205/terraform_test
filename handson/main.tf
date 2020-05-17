@@ -568,3 +568,10 @@ resource "aws_kms_alias" "example" {
   target_key_id = aws_kms_key.example.key_id
 }
 
+resource "aws_ssm_parameter" "db_username" {
+  name = "/db/username"
+  value = "root"
+  type = "String"
+  description = "データベースのユーザー名"
+}
+
