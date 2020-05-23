@@ -807,3 +807,16 @@ module "codepipeline_role" {
   identifier = "codepipeline.amazonaws.com"
   policy     = data.aws_iam_policy_document.codepipeline.json
 }
+
+resource "aws_s3_bucket" "artifact" {
+  bucket = "junbucket-artifact"
+
+  lifecycle_rule {
+    enabled = true
+
+    expiration {
+      days = "180"
+    }
+  }
+  force_destroy = true
+}
