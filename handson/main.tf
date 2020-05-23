@@ -841,7 +841,6 @@ resource "aws_codepipeline" "example" {
       output_artifacts = ["Source"]
 
       configuration = {
-        OAuthToken = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
         Owner                = "JUNWEBFREE"
         Repo                 = "example"
         Branch               = "master"
@@ -911,7 +910,6 @@ resource "aws_codepipeline_webhook" "example" {
 
 provider "github" {
   organization = "JUNWEBFREE"
-  token = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 }
 
 resource "github_repository_webhook" "example" {
