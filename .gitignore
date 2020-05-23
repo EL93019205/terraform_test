@@ -4,3 +4,4 @@ terraform-provider-aws_v2.61.0_x4
 terraform.tfstate
 terraform.tfstate.backup
 modules.json
+terraform-provider-github_v2.8.0_x4
