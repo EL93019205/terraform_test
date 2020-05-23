@@ -694,3 +694,7 @@ module "redis_sg" {
   port = 6379
   cidr_blocks = [aws_vpc.example.cidr_block]
 }
+
+resource "aws_ecr_repository" "example" {
+  name = "example"
+}
