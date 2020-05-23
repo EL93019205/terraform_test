@@ -904,3 +904,9 @@ resource "aws_codepipeline_webhook" "example" {
     match_equals = "refs/heads/{Branch}"
   }
 }
+
+provider "github" {
+  organization = "JUNWEBFREE"
+  token = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+}
+
