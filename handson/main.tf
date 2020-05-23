@@ -584,7 +584,7 @@ resource "aws_ssm_parameter" "db_password" {
     ignore_changes = [value]
   }
 }
-
+/*
 resource "aws_db_parameter_group" "example" {
   name = "example"
   family = "mysql5.7"
@@ -654,7 +654,9 @@ module "mysql_sg" {
   port = 3306
   cidr_blocks = [aws_vpc.example.cidr_block]
 }
+*/
 
+/*
 resource "aws_elasticache_parameter_group" "example" {
   name = "example"
   family = "redis5.0"
@@ -694,6 +696,8 @@ module "redis_sg" {
   port = 6379
   cidr_blocks = [aws_vpc.example.cidr_block]
 }
+
+*/
 
 resource "aws_ecr_repository" "example" {
   name = "example"
