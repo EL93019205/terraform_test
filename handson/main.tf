@@ -1015,3 +1015,16 @@ resource "aws_ssm_document" "session_manages_run_shell" {
   }
   EOF
 }
+
+resource "aws_s3_bucket" "cloudwatch_logs" {
+  bucket = "junbucket-cloudwatch"
+
+  lifecycle_rule {
+    enabled = true
+
+    expiration {
+      days = "180"
+    }
+  }
+  force_destroy = true
+}
