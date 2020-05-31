@@ -1111,3 +1111,11 @@ data "aws_region" "current" {}
 output "region_name" {
   value = data.aws_region.current.name
 }
+
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+output "availability_zones" {
+  value = data.aws_availability_zones.available.names
+}
