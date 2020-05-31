@@ -1,11 +1,15 @@
+terraform {
+  required_version = "0.12.24"
+}
+
 provider "aws" {
   region = "ap-northeast-1"
 }
 
 data "aws_iam_policy_document" "allow_describe_regions" {
   statement {
-    effect = "Allow"
-    actions = ["ec2:DescribeRegions"]
+    effect    = "Allow"
+    actions   = ["ec2:DescribeRegions"]
     resources = ["*"]
   }
 }
@@ -35,16 +39,16 @@ resource "aws_s3_bucket" "private" {
 }
 
 resource "aws_s3_bucket_public_access_block" "private" {
-  bucket = aws_s3_bucket.private.id
-  block_public_acls = true
-  block_public_policy = true
-  ignore_public_acls = true
+  bucket                  = aws_s3_bucket.private.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket" "public" {
   bucket = "junbucket-public"
-  acl = "public-read"
+  acl    = "public-read"
 
   cors_rule {
     allowed_origins = ["https://example.com"]
@@ -74,21 +78,21 @@ resource "aws_s3_bucket_policy" "alb_log" {
 }
 
 data "aws_iam_policy_document" "alb_log" {
-  statement{
-    effect = "Allow"
-    actions = ["s3:PutObject"]
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
     resources = ["arn:aws:s3:::${aws_s3_bucket.alb_log.id}/*"]
 
     principals {
-      type = "AWS"
-      identifiers =  ["582318560864"]
+      type        = "AWS"
+      identifiers = ["582318560864"]
     }
   }
 }
 
 resource "aws_vpc" "example" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_support = true
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
@@ -97,20 +101,20 @@ resource "aws_vpc" "example" {
 }
 
 resource "aws_subnet" "public_0" {
-  vpc_id = aws_vpc.example.id
-  cidr_block = "10.0.1.0/24"
+  vpc_id                  = aws_vpc.example.id
+  cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
-  availability_zone = "ap-northeast-1a"
+  availability_zone       = "ap-northeast-1a"
   tags = {
     Name = "public_0_subnet"
   }
 }
 
 resource "aws_subnet" "public_1" {
-  vpc_id = aws_vpc.example.id
-  cidr_block = "10.0.2.0/24"
+  vpc_id                  = aws_vpc.example.id
+  cidr_block              = "10.0.2.0/24"
   map_public_ip_on_launch = true
-  availability_zone = "ap-northeast-1c"
+  availability_zone       = "ap-northeast-1c"
   tags = {
     Name = "public_1_subnet"
   }
@@ -131,25 +135,25 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route" "public" {
-  route_table_id = aws_route_table.public.id
-  gateway_id = aws_internet_gateway.example.id
+  route_table_id         = aws_route_table.public.id
+  gateway_id             = aws_internet_gateway.example.id
   destination_cidr_block = "0.0.0.0/0"
 }
 
 resource "aws_route_table_association" "public_0" {
-  subnet_id = aws_subnet.public_0.id
+  subnet_id      = aws_subnet.public_0.id
   route_table_id = aws_route_table.public.id
 }
 
 resource "aws_route_table_association" "public_1" {
-  subnet_id = aws_subnet.public_1.id
+  subnet_id      = aws_subnet.public_1.id
   route_table_id = aws_route_table.public.id
 }
 
 resource "aws_subnet" "private_0" {
-  vpc_id = aws_vpc.example.id
-  cidr_block = "10.0.65.0/24"
-  availability_zone = "ap-northeast-1a"
+  vpc_id                  = aws_vpc.example.id
+  cidr_block              = "10.0.65.0/24"
+  availability_zone       = "ap-northeast-1a"
   map_public_ip_on_launch = false
   tags = {
     Name = "private_0_subnet"
@@ -157,9 +161,9 @@ resource "aws_subnet" "private_0" {
 }
 
 resource "aws_subnet" "private_1" {
-  vpc_id = aws_vpc.example.id
-  cidr_block = "10.0.66.0/24"
-  availability_zone = "ap-northeast-1c"
+  vpc_id                  = aws_vpc.example.id
+  cidr_block              = "10.0.66.0/24"
+  availability_zone       = "ap-northeast-1c"
   map_public_ip_on_launch = false
   tags = {
     Name = "private_1_subnet"
@@ -181,17 +185,17 @@ resource "aws_route_table" "private_1" {
 }
 
 resource "aws_route_table_association" "private_0" {
-  subnet_id = aws_subnet.private_0.id
+  subnet_id      = aws_subnet.private_0.id
   route_table_id = aws_route_table.private_0.id
 }
 
 resource "aws_route_table_association" "private_1" {
-  subnet_id = aws_subnet.private_1.id
+  subnet_id      = aws_subnet.private_1.id
   route_table_id = aws_route_table.private_1.id
 }
 
 resource "aws_eip" "nat_gateway_0" {
-  vpc = true
+  vpc        = true
   depends_on = [aws_internet_gateway.example]
   tags = {
     Name = "eip0"
@@ -199,7 +203,7 @@ resource "aws_eip" "nat_gateway_0" {
 }
 
 resource "aws_eip" "nat_gateway_1" {
-  vpc = true
+  vpc        = true
   depends_on = [aws_internet_gateway.example]
   tags = {
     Name = "eip1"
@@ -208,8 +212,8 @@ resource "aws_eip" "nat_gateway_1" {
 
 resource "aws_nat_gateway" "nat_gateway_0" {
   allocation_id = aws_eip.nat_gateway_0.id
-  subnet_id = aws_subnet.public_0.id
-  depends_on = [aws_internet_gateway.example]
+  subnet_id     = aws_subnet.public_0.id
+  depends_on    = [aws_internet_gateway.example]
   tags = {
     Name = "public_0_subnet_nat_gateway_0"
   }
@@ -217,38 +221,38 @@ resource "aws_nat_gateway" "nat_gateway_0" {
 
 resource "aws_nat_gateway" "nat_gateway_1" {
   allocation_id = aws_eip.nat_gateway_1.id
-  subnet_id = aws_subnet.public_1.id
-  depends_on = [aws_internet_gateway.example]
+  subnet_id     = aws_subnet.public_1.id
+  depends_on    = [aws_internet_gateway.example]
   tags = {
     Name = "public_1_subnet_nat_gateway_1"
   }
 }
 
 resource "aws_route" "private_0" {
-  route_table_id = aws_route_table.private_0.id
-  nat_gateway_id = aws_nat_gateway.nat_gateway_0.id
+  route_table_id         = aws_route_table.private_0.id
+  nat_gateway_id         = aws_nat_gateway.nat_gateway_0.id
   destination_cidr_block = "0.0.0.0/0"
 }
 
 resource "aws_route" "private_1" {
-  route_table_id = aws_route_table.private_1.id
-  nat_gateway_id = aws_nat_gateway.nat_gateway_1.id
+  route_table_id         = aws_route_table.private_1.id
+  nat_gateway_id         = aws_nat_gateway.nat_gateway_1.id
   destination_cidr_block = "0.0.0.0/0"
 }
 
 module "example_sg" {
-  source = "./security_group"
-  name = "module-sg"
-  vpc_id = aws_vpc.example.id
-  port = 80
+  source      = "./security_group"
+  name        = "module-sg"
+  vpc_id      = aws_vpc.example.id
+  port        = 80
   cidr_blocks = ["0.0.0.0/0"]
 }
 
 resource "aws_lb" "example" {
-  name = "example"
-  load_balancer_type = "application"
-  internal = false
-  idle_timeout = 60
+  name                       = "example"
+  load_balancer_type         = "application"
+  internal                   = false
+  idle_timeout               = 60
   enable_deletion_protection = false
 
   subnets = [
@@ -257,7 +261,7 @@ resource "aws_lb" "example" {
   ]
 
   access_logs {
-    bucket = aws_s3_bucket.alb_log.id
+    bucket  = aws_s3_bucket.alb_log.id
     enabled = true
   }
 
@@ -273,33 +277,33 @@ output "alb_dns_name" {
 }
 
 module "http_sg" {
-  source = "./security_group"
-  name = "http-sg"
-  vpc_id = aws_vpc.example.id
-  port = 80
+  source      = "./security_group"
+  name        = "http-sg"
+  vpc_id      = aws_vpc.example.id
+  port        = 80
   cidr_blocks = ["0.0.0.0/0"]
 }
 
 module "https_sg" {
-  source = "./security_group"
-  name = "https-sg"
-  vpc_id = aws_vpc.example.id
-  port = 443
+  source      = "./security_group"
+  name        = "https-sg"
+  vpc_id      = aws_vpc.example.id
+  port        = 443
   cidr_blocks = ["0.0.0.0/0"]
 }
 
 module "http_redirect_sg" {
-  source = "./security_group"
-  name = "http-redirect-sg"
-  vpc_id = aws_vpc.example.id
-  port = 8080
+  source      = "./security_group"
+  name        = "http-redirect-sg"
+  vpc_id      = aws_vpc.example.id
+  port        = 8080
   cidr_blocks = ["0.0.0.0/0"]
 }
 
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.example.arn
-  port = "80"
-  protocol = "HTTP"
+  port              = "80"
+  protocol          = "HTTP"
 
   default_action {
     type = "fixed-response"
@@ -307,7 +311,7 @@ resource "aws_lb_listener" "http" {
     fixed_response {
       content_type = "text/plain"
       message_body = "これはhttpです"
-      status_code = "200"
+      status_code  = "200"
     }
   }
 }
@@ -318,13 +322,13 @@ data "aws_route53_zone" "example" {
 
 resource "aws_route53_record" "example" {
   zone_id = data.aws_route53_zone.example.zone_id
-  name = data.aws_route53_zone.example.name
+  name    = data.aws_route53_zone.example.name
 
   type = "A"
 
   alias {
-    name = aws_lb.example.dns_name
-    zone_id = aws_lb.example.zone_id
+    name                   = aws_lb.example.dns_name
+    zone_id                = aws_lb.example.zone_id
     evaluate_target_health = true
   }
 }
@@ -334,9 +338,9 @@ output "domain_name" {
 }
 
 resource "aws_acm_certificate" "example" {
-  domain_name = aws_route53_record.example.name
+  domain_name               = aws_route53_record.example.name
   subject_alternative_names = []
-  validation_method = "DNS"
+  validation_method         = "DNS"
 
   lifecycle {
     create_before_destroy = true
@@ -344,24 +348,24 @@ resource "aws_acm_certificate" "example" {
 }
 
 resource "aws_route53_record" "example_certificate" {
-  name = aws_acm_certificate.example.domain_validation_options[0].resource_record_name
-  type = aws_acm_certificate.example.domain_validation_options[0].resource_record_type
+  name    = aws_acm_certificate.example.domain_validation_options[0].resource_record_name
+  type    = aws_acm_certificate.example.domain_validation_options[0].resource_record_type
   records = [aws_acm_certificate.example.domain_validation_options[0].resource_record_value]
   zone_id = data.aws_route53_zone.example.id
-  ttl = 60
+  ttl     = 60
 }
 
 resource "aws_acm_certificate_validation" "example" {
-  certificate_arn = aws_acm_certificate.example.arn
+  certificate_arn         = aws_acm_certificate.example.arn
   validation_record_fqdns = [aws_route53_record.example_certificate.fqdn]
 }
 
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.example.arn
-  port = "443"
-  protocol = "HTTPS"
-  certificate_arn = aws_acm_certificate.example.arn
-  ssl_policy = "ELBSecurityPolicy-2016-08"
+  port              = "443"
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.example.arn
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
 
   default_action {
     type = "fixed-response"
@@ -369,44 +373,44 @@ resource "aws_lb_listener" "https" {
     fixed_response {
       content_type = "text/plain"
       message_body = "これはHTTPSです"
-      status_code = "200"
+      status_code  = "200"
     }
   }
 }
 
 resource "aws_lb_listener" "redirect_http_to_https" {
   load_balancer_arn = aws_lb.example.arn
-  port = "8080"
-  protocol = "HTTP"
+  port              = "8080"
+  protocol          = "HTTP"
 
   default_action {
     type = "redirect"
 
     redirect {
-      port = "443"
-      protocol = "HTTPS"
+      port        = "443"
+      protocol    = "HTTPS"
       status_code = "HTTP_301"
     }
   }
 }
 
 resource "aws_lb_target_group" "example" {
-  name = "example"
-  target_type = "ip"
-  vpc_id = aws_vpc.example.id
-  port = 80
-  protocol = "HTTP"
+  name                 = "example"
+  target_type          = "ip"
+  vpc_id               = aws_vpc.example.id
+  port                 = 80
+  protocol             = "HTTP"
   deregistration_delay = 300
 
   health_check {
-    path = "/"
-    healthy_threshold = 5
+    path                = "/"
+    healthy_threshold   = 5
     unhealthy_threshold = 2
-    timeout = 5
-    interval = 30
-    matcher = 200
-    port = "traffic-port"
-    protocol = "HTTP"
+    timeout             = 5
+    interval            = 30
+    matcher             = 200
+    port                = "traffic-port"
+    protocol            = "HTTP"
   }
 
   depends_on = [aws_lb.example]
@@ -414,16 +418,17 @@ resource "aws_lb_target_group" "example" {
 
 resource "aws_lb_listener_rule" "example" {
   listener_arn = aws_lb_listener.https.arn
-  priority = 100
+  priority     = 100
 
   action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.example.arn
   }
 
   condition {
-    field = "path-pattern"
-    values = ["/*"]
+    path_pattern {
+      values = ["/*"]
+    }
   }
 }
 
@@ -432,27 +437,27 @@ resource "aws_ecs_cluster" "example" {
 }
 
 resource "aws_ecs_task_definition" "example" {
-  family = "example"
-  cpu = "256"
-  memory = "512"
-  network_mode = "awsvpc"
+  family                   = "example"
+  cpu                      = "256"
+  memory                   = "512"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  container_definitions = file("./container_definitions.json")
-  execution_role_arn = module.ecs_task_execution_role.iam_role_arn
+  container_definitions    = file("./container_definitions.json")
+  execution_role_arn       = module.ecs_task_execution_role.iam_role_arn
 }
 
 resource "aws_ecs_service" "example" {
-  name = "example"
-  cluster = aws_ecs_cluster.example.arn
-  task_definition = aws_ecs_task_definition.example.arn
-  desired_count = 2
-  launch_type = "FARGATE"
-  platform_version = "1.3.0"
+  name                              = "example"
+  cluster                           = aws_ecs_cluster.example.arn
+  task_definition                   = aws_ecs_task_definition.example.arn
+  desired_count                     = 2
+  launch_type                       = "FARGATE"
+  platform_version                  = "1.3.0"
   health_check_grace_period_seconds = 60
 
   network_configuration {
     assign_public_ip = false
-    security_groups = [module.nginx_sg.security_group_id]
+    security_groups  = [module.nginx_sg.security_group_id]
 
     subnets = [
       aws_subnet.private_0.id,
@@ -462,8 +467,8 @@ resource "aws_ecs_service" "example" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.example.arn
-    container_name = "example"
-    container_port = 80
+    container_name   = "example"
+    container_port   = 80
   }
 
   lifecycle {
@@ -472,15 +477,15 @@ resource "aws_ecs_service" "example" {
 }
 
 module "nginx_sg" {
-  source = "./security_group"
-  name = "nginx-sg"
-  vpc_id = aws_vpc.example.id
-  port = 80
+  source      = "./security_group"
+  name        = "nginx-sg"
+  vpc_id      = aws_vpc.example.id
+  port        = 80
   cidr_blocks = [aws_vpc.example.cidr_block]
 }
 
 resource "aws_cloudwatch_log_group" "for_ecs" {
-  name = "/ecs/example"
+  name              = "/ecs/example"
   retention_in_days = 180
 }
 
@@ -492,39 +497,39 @@ data "aws_iam_policy_document" "ecs_task_execution" {
   source_json = data.aws_iam_policy.ecs_task_execution_role_policy.policy
 
   statement {
-    effect = "Allow"
-    actions = ["ssm:GetParameters", "kms:Decrypt"]
+    effect    = "Allow"
+    actions   = ["ssm:GetParameters", "kms:Decrypt"]
     resources = ["*"]
   }
 }
 
 module "ecs_task_execution_role" {
-  source = "./iam_role"
-  name = "ecs-task-execution"
+  source     = "./iam_role"
+  name       = "ecs-task-execution"
   identifier = "ecs-tasks.amazonaws.com"
-  policy = data.aws_iam_policy_document.ecs_task_execution.json
+  policy     = data.aws_iam_policy_document.ecs_task_execution.json
 }
 
 resource "aws_cloudwatch_log_group" "for_ecs_scheduled_tasks" {
-  name = "/ecs-scheduled-tasks/example"
+  name              = "/ecs-scheduled-tasks/example"
   retention_in_days = 180
 }
 
 resource "aws_ecs_task_definition" "example_batch" {
-  family = "example-batch"
-  cpu = "256"
-  memory = "512"
-  network_mode = "awsvpc"
+  family                   = "example-batch"
+  cpu                      = "256"
+  memory                   = "512"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  container_definitions = file("./batch_container_definitions.json")
-  execution_role_arn = module.ecs_task_execution_role.iam_role_arn
+  container_definitions    = file("./batch_container_definitions.json")
+  execution_role_arn       = module.ecs_task_execution_role.iam_role_arn
 }
 
 module "ecs_events_role" {
-  source = "./iam_role"
-  name = "ecs-events"
+  source     = "./iam_role"
+  name       = "ecs-events"
   identifier = "events.amazonaws.com"
-  policy = data.aws_iam_policy.ecs_events_role_policy.policy
+  policy     = data.aws_iam_policy.ecs_events_role_policy.policy
 }
 
 data "aws_iam_policy" "ecs_events_role_policy" {
@@ -532,53 +537,53 @@ data "aws_iam_policy" "ecs_events_role_policy" {
 }
 
 resource "aws_cloudwatch_event_rule" "example_batch" {
-  name = "example-batch"
-  description = "とても重要なバッチ処理です"
+  name                = "example-batch"
+  description         = "とても重要なバッチ処理です"
   schedule_expression = "cron(*/2 * * * ? *)"
 }
 
 resource "aws_cloudwatch_event_target" "example_batch" {
   target_id = "example-batch"
-  rule = aws_cloudwatch_event_rule.example_batch.name
-  role_arn = module.ecs_events_role.iam_role_arn
-  arn = aws_ecs_cluster.example.arn
+  rule      = aws_cloudwatch_event_rule.example_batch.name
+  role_arn  = module.ecs_events_role.iam_role_arn
+  arn       = aws_ecs_cluster.example.arn
 
   ecs_target {
-    launch_type = "FARGATE"
-    task_count = 1
-    platform_version = "1.3.0"
+    launch_type         = "FARGATE"
+    task_count          = 1
+    platform_version    = "1.3.0"
     task_definition_arn = aws_ecs_task_definition.example_batch.arn
 
     network_configuration {
       assign_public_ip = "false"
-      subnets = [aws_subnet.private_0.id]
+      subnets          = [aws_subnet.private_0.id]
     }
   }
 }
 
 resource "aws_kms_key" "example" {
-  description = "Example Customer Master Key"
-  enable_key_rotation = true
-  is_enabled = true
+  description             = "Example Customer Master Key"
+  enable_key_rotation     = true
+  is_enabled              = true
   deletion_window_in_days = 30
 }
 
 resource "aws_kms_alias" "example" {
-  name = "alias/example"
+  name          = "alias/example"
   target_key_id = aws_kms_key.example.key_id
 }
 
 resource "aws_ssm_parameter" "db_username" {
-  name = "/db/username"
-  value = "root"
-  type = "String"
+  name        = "/db/username"
+  value       = "root"
+  type        = "String"
   description = "データベースのユーザー名"
 }
 
 resource "aws_ssm_parameter" "db_password" {
-  name = "/db/password"
-  value = "uninitialized"
-  type = "SecureString"
+  name        = "/db/password"
+  value       = "uninitialized"
+  type        = "SecureString"
   description = "データベースのパスワード"
   lifecycle {
     ignore_changes = [value]
@@ -729,7 +734,7 @@ resource "aws_ecr_lifecycle_policy" "example" {
 
 data "aws_iam_policy_document" "codebuild" {
   statement {
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["*"]
 
     actions = [
@@ -756,14 +761,14 @@ data "aws_iam_policy_document" "codebuild" {
 }
 
 module "codebuild_role" {
-  source = "./iam_role"
-  name = "codebuild"
+  source     = "./iam_role"
+  name       = "codebuild"
   identifier = "codebuild.amazonaws.com"
-  policy = data.aws_iam_policy_document.codebuild.json
+  policy     = data.aws_iam_policy_document.codebuild.json
 }
 
 resource "aws_codebuild_project" "example" {
-  name = "example"
+  name         = "example"
   service_role = module.codebuild_role.iam_role_arn
 
   source {
@@ -775,9 +780,9 @@ resource "aws_codebuild_project" "example" {
   }
 
   environment {
-    type = "LINUX_CONTAINER"
-    compute_type = "BUILD_GENERAL1_SMALL"
-    image = "aws/codebuild/standard:2.0"
+    type            = "LINUX_CONTAINER"
+    compute_type    = "BUILD_GENERAL1_SMALL"
+    image           = "aws/codebuild/standard:2.0"
     privileged_mode = true
   }
 }
@@ -893,17 +898,17 @@ resource "aws_codepipeline" "example" {
 }
 
 resource "aws_codepipeline_webhook" "example" {
-  name = "example"
+  name            = "example"
   target_pipeline = aws_codepipeline.example.name
-  target_action = "Source"
-  authentication = "GITHUB_HMAC"
+  target_action   = "Source"
+  authentication  = "GITHUB_HMAC"
 
   authentication_configuration {
     secret_token = "VeryRandomStringMoreThan20Byte!"
   }
 
   filter {
-    json_path = "$.ref"
+    json_path    = "$.ref"
     match_equals = "refs/heads/{Branch}"
   }
 }
@@ -916,8 +921,8 @@ resource "github_repository_webhook" "example" {
   repository = "example"
 
   configuration {
-    url = aws_codepipeline_webhook.example.url
-    secret = "VeryRandomStringMoreThan20Byte!"
+    url          = aws_codepipeline_webhook.example.url
+    secret       = "VeryRandomStringMoreThan20Byte!"
     content_type = "json"
     insecure_ssl = false
   }
@@ -929,7 +934,7 @@ data "aws_iam_policy_document" "ec2_for_ssm" {
   source_json = data.aws_iam_policy.ec2_for_ssm.policy
 
   statement {
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["*"]
 
     actions = [
@@ -953,10 +958,10 @@ data "aws_iam_policy" "ec2_for_ssm" {
 }
 
 module "ec2_for_ssm_role" {
-  source = "./iam_role"
-  name = "ec2-for-ssm"
+  source     = "./iam_role"
+  name       = "ec2-for-ssm"
   identifier = "ec2.amazonaws.com"
-  policy = data.aws_iam_policy_document.ec2_for_ssm.json
+  policy     = data.aws_iam_policy_document.ec2_for_ssm.json
 }
 
 resource "aws_iam_instance_profile" "ec2_for_ssm" {
@@ -965,11 +970,11 @@ resource "aws_iam_instance_profile" "ec2_for_ssm" {
 }
 
 resource "aws_instance" "example_for_operation" {
-  ami = "ami-0c3fd0f5d33134a76"
-  instance_type = "t3.micro"
+  ami                  = "ami-0c3fd0f5d33134a76"
+  instance_type        = "t3.micro"
   iam_instance_profile = aws_iam_instance_profile.ec2_for_ssm.name
-  subnet_id = aws_subnet.private_0.id
-  user_data = file("./user_data.sh")
+  subnet_id            = aws_subnet.private_0.id
+  user_data            = file("./user_data.sh")
   tags = {
     Name = "sshless_operation"
   }
@@ -994,13 +999,13 @@ resource "aws_s3_bucket" "operation" {
 }
 
 resource "aws_cloudwatch_log_group" "operation" {
-  name = "/operation"
+  name              = "/operation"
   retention_in_days = 180
 }
 
 resource "aws_ssm_document" "session_manages_run_shell" {
-  name = "SSM-SessionManagerRunShell"
-  document_type = "Session"
+  name            = "SSM-SessionManagerRunShell"
+  document_type   = "Session"
   document_format = "JSON"
 
   content = <<EOF
@@ -1050,48 +1055,74 @@ data "aws_iam_policy_document" "kinesis_data_firehose" {
 }
 
 module "kinesis_data_firehose_role" {
-  source = "./iam_role"
-  name = "kinesis-data-firehose"
+  source     = "./iam_role"
+  name       = "kinesis-data-firehose"
   identifier = "firehose.amazonaws.com"
-  policy = data.aws_iam_policy_document.kinesis_data_firehose.json
+  policy     = data.aws_iam_policy_document.kinesis_data_firehose.json
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "example" {
-  name = "example"
+  name        = "example"
   destination = "s3"
 
   s3_configuration {
-    role_arn = module.kinesis_data_firehose_role.iam_role_arn
+    role_arn   = module.kinesis_data_firehose_role.iam_role_arn
     bucket_arn = aws_s3_bucket.cloudwatch_logs.arn
-    prefix = "ecs-scheduled-tasks/example/"
+    prefix     = "ecs-scheduled-tasks/example/"
   }
 }
 
 data "aws_iam_policy_document" "cloudwatch_logs" {
   statement {
-    effect = "Allow"
-    actions = ["firehose:*"]
+    effect    = "Allow"
+    actions   = ["firehose:*"]
     resources = ["arn:aws:firehose:ap-northeast-1:*:*"]
   }
 
   statement {
-    effect = "Allow"
-    actions = ["iam:PassRole"]
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
     resources = ["arn:aws:iam::*:role/cloudwatch-logs"]
   }
 }
 
 module "cloudwatch_logs_role" {
-  source = "./iam_role"
-  name = "cloudwatch-logs"
+  source     = "./iam_role"
+  name       = "cloudwatch-logs"
   identifier = "logs.ap-northeast-1.amazonaws.com"
-  policy = data.aws_iam_policy_document.cloudwatch_logs.json
+  policy     = data.aws_iam_policy_document.cloudwatch_logs.json
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "example" {
-  name = "example"
-  log_group_name = aws_cloudwatch_log_group.for_ecs_scheduled_tasks.name
+  name            = "example"
+  log_group_name  = aws_cloudwatch_log_group.for_ecs_scheduled_tasks.name
   destination_arn = aws_kinesis_firehose_delivery_stream.example.arn
-  filter_pattern = "[]"
-  role_arn = module.cloudwatch_logs_role.iam_role_arn
+  filter_pattern  = "[]"
+  role_arn        = module.cloudwatch_logs_role.iam_role_arn
+}
+
+data "aws_caller_identity" "current" {}
+
+output "account_id" {
+  value = data.aws_caller_identity.current.account_id
+}
+
+data "aws_region" "current" {}
+
+output "region_name" {
+  value = data.aws_region.current.name
+}
+
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+output "availability_zones" {
+  value = data.aws_availability_zones.available.names
+}
+
+data "aws_elb_service_account" "current" {}
+
+output "alb_service_account_id" {
+  value = data.aws_elb_service_account.current.id
 }
