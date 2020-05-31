@@ -1099,3 +1099,9 @@ resource "aws_cloudwatch_log_subscription_filter" "example" {
   filter_pattern  = "[]"
   role_arn        = module.cloudwatch_logs_role.iam_role_arn
 }
+
+data "aws_caller_identity" "current" {}
+
+output "account_id" {
+  value = data.aws_caller_identity.current.account_id
+}
